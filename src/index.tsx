@@ -2,17 +2,19 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { BrowserRouter as Router } from 'react-router-dom'
-
+import { PersistGate } from 'redux-persist/integration/react'
 import App from './App'
-import * as serviceWorker from './serviceWorker'
 import makeStore from './redux/store'
+import * as serviceWorker from './serviceWorker'
 
-const store = makeStore()
+const { store, persistor } = makeStore()
 
 const WithProvider = () => (
   <Provider store={store}>
     <Router>
-      <App />
+      <PersistGate persistor={persistor}>
+        <App />
+      </PersistGate>
     </Router>
   </Provider>
 )

@@ -1,9 +1,10 @@
-import { createStore, applyMiddleware, compose } from 'redux'
+import { applyMiddleware, compose, createStore } from 'redux'
+import { persistStore } from 'redux-persist'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
-
+import { initialBoardData } from '../data/board-initial-data'
 import { AppState } from '../types'
-import createRootReducer from './reducers'
+import rootReducer from './reducers'
 import rootSaga from './sagas'
 
 const initState: AppState = {
@@ -11,7 +12,11 @@ const initState: AppState = {
     inCart: [],
   },
   ui: {
+    board: initialBoardData,
     dialogOpen: {},
+    newCardItem: '',
+    focusCard: '',
+    refresh: false,
   },
 }
 
@@ -22,15 +27,19 @@ export default function makeStore(initialState = initState) {
 
   if (process.env.NODE_ENV === 'development') {
     if ((window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) {
-      composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+      composeEnhancers = (window as any)
+        .__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     }
   }
 
   const store = createStore(
-    createRootReducer(),
+    rootReducer,
     initialState,
     composeEnhancers(applyMiddleware(...middlewares))
   )
+
+  // @ts-ignore c
+  const persistor = persistStore(store)
 
   sagaMiddleware.run(rootSaga)
 
@@ -41,5 +50,5 @@ export default function makeStore(initialState = initState) {
     })
   }
 
-  return store
+  return { store, persistor }
 }
