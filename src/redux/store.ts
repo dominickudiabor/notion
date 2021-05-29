@@ -13,10 +13,6 @@ const initState: AppState = {
   },
   ui: {
     board: initialBoardData,
-    dialogOpen: {},
-    newCardItem: '',
-    focusCard: '',
-    refresh: false,
   },
 }
 

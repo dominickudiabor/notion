@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Droppable } from 'react-beautiful-dnd'
 import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
-import { refreshBoard, setNewItemValue } from '../redux/actions'
+import { setNewItemValue } from '../redux/actions'
 // Import BoardItem component
 import { BoardItem } from './board-item'
 
@@ -51,25 +51,24 @@ const BoardInput = styled.input`
 // Create and export the BoardColumn component
 export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
   const dispatch = useDispatch()
+
   //handle user input
   const [input, setInput] = React.useState('')
 
   const handleNewInput = (e: { target: HTMLInputElement }) => {
     const { value } = e.target
     setInput(value)
-    console.log(typeof e.target.name)
-    //dispatch(setNewItemValue({ newItem: input, columnFocus: name }))
   }
 
-  const handleSubmit = async (event: { key: string }) => {
+  const handleSubmit = async (event: {
+        key: string
+        currentTarget: { name: string; value: string }
+    }) => {
     if (event.key === 'Enter') {
       if (input.length < 1) return
-      dispatch(refreshBoard(true))
+      const { name, value } = event.currentTarget
       setInput('')
-      dispatch(setNewItemValue({ newItem: '', columnFocus: '' }))
-      setTimeout(() => {
-        dispatch(refreshBoard(false))
-      }, 3000)
+      dispatch(setNewItemValue({ newItem: value, columnFocus: name }))
     }
   }
 

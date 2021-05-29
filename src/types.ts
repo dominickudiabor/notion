@@ -3,10 +3,8 @@ export const ADD_PRODUCT = 'ADD_PRODUCT'
 export const REMOVE_PRODUCT = 'REMOVE_PRODUCT'
 
 //UI types
-export const TOGGLE_DIALOG = 'TOGGLE_DIALOG'
-export const SET_NEW_VALUE = 'SET_NEW_VALUE'
-export const SET_REFRESH_VALUE = 'SET_REFRESH_VALUE'
 export const REFRESH_BOARD_STATE = 'REFRESH_BOARD_STATE'
+export const SET_NEW_VALUE = 'SET_NEW_VALUE'
 // Enum
 export enum DialogType {
     SignIn = 'signIn',
@@ -35,24 +33,11 @@ export type RemoveProductAction = {
 }
 
 //Ui Actions
-export type ToggleDialogAction = {
-    type: typeof TOGGLE_DIALOG
-    payload: {
-        dialog: DialogType
-    }
-}
 
 export type SetNewValueAction = {
     type: typeof SET_NEW_VALUE
     payload: {
         newItemDetails: newItemProps
-    }
-}
-
-export type SetRefreshValueAction = {
-    type: typeof SET_REFRESH_VALUE
-    payload: {
-        activate: Boolean
     }
 }
 
@@ -68,11 +53,7 @@ export type newItemProps = {
     columnFocus: string
 }
 
-export type UiActions =
-    | ToggleDialogAction
-    | SetNewValueAction
-    | SetRefreshValueAction
-    | RefreshBoardStateAction
+export type UiActions = SetNewValueAction | RefreshBoardStateAction
 
 // Use this union in reducer
 export type ProductActions = AddProductAction | RemoveProductAction
@@ -83,12 +64,6 @@ export type ProductState = {
 
 // Using dynamic keys from an enum
 export type UiState = {
-    dialogOpen: {
-        [key in DialogType]?: boolean
-    }
-    newCardItem: string
-    focusCard: string
-    refresh: Boolean
     board: BoardState
 }
 
