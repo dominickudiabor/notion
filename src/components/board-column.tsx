@@ -68,7 +68,9 @@ export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
       if (input.length < 1) return
       const { name, value } = event.currentTarget
       setInput('')
-      dispatch(setNewItemValue({ newItem: value, columnFocus: name }))
+      dispatch(
+        setNewItemValue({ newItem: value, columnFocus: name.trim() })
+      )
     }
   }
 

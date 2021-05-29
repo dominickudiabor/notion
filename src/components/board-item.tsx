@@ -1,6 +1,11 @@
 import * as React from 'react'
+import { useState } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
+import Modal from 'react-modal'
 import styled from 'styled-components'
+
+//connect modal to app
+Modal.setAppElement('#root')
 
 // Define types for board item element properties
 type BoardItemProps = {
@@ -32,19 +37,34 @@ const BoardItemEl = styled.div<BoardItemStylesProps>`
 
 // Create and export the BoardItem component
 export const BoardItem = (props: BoardItemProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const activateModal = () => {
+    setIsOpen(!isOpen)
+  }
   return (
     <Draggable draggableId={props.item.id} index={props.index}>
       {(provided, snapshot) => (
         //The BoardItem
-        <BoardItemEl
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          ref={provided.innerRef}
-          isDragging={snapshot.isDragging}
-        >
-          {/* The content of the BoardItem */}
-          {props.item.content}
-        </BoardItemEl>
+        <>
+          <BoardItemEl
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            ref={provided.innerRef}
+            isDragging={snapshot.isDragging}
+            onDoubleClick={activateModal}
+          >
+            {/* The content of the BoardItem */}
+            {props.item.content}
+          </BoardItemEl>
+          <Modal
+            isOpen={isOpen}
+            onRequestClose={activateModal}
+            contentLabel="My dialog"
+          >
+            <button onClick={activateModal}>Close modal</button>
+            <textarea defaultValue={props.item.content}></textarea>
+          </Modal>
+        </>
       )}
     </Draggable>
   )

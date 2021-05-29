@@ -18,33 +18,7 @@ export const Board = () => {
   // Initialize board state with board data
   const { board: state } = useSelector((state: AppState) => state.ui)
 
-  // const {
-  //     focusCard: focusColumn,
-  //     newCardItem: newItem,
-  //     refresh,
-  // } = useSelector((state: AppState) => state.ui)
-
   const dispatch = useDispatch()
-
-  //Add new items to board
-  // useEffect(() => {
-  //     function refreshState() {
-  //         setState({
-  //             ...state,
-  //             columns: {
-  //                 ...state.columns,
-  //                 [focusColumn]: {
-  //                     ...state.columns[focusColumn],
-  //                     itemsIds: [
-  //                         ...state.columns[focusColumn].itemsIds,
-  //                         newItem,
-  //                     ],
-  //                 },
-  //             },
-  //         })
-  //     }
-  //     refresh && refreshState()
-  // }, [refresh, focusColumn, newItem, state])
 
   // Handle drag & drop
   const onDragEnd = (result: any) => {

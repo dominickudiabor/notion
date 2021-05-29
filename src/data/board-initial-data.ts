@@ -7,6 +7,7 @@ export const initialBoardData = {
     'item-5': { id: 'item-5', content: 'Content of item 5.' },
     'item-6': { id: 'item-6', content: 'Content of item 6.' },
     'item-7': { id: 'item-7', content: 'Content of item 7.' },
+    'item-8': { id: 'item-8', content: 'Content of item 8.' },
   },
   columns: {
     'column-1': {
@@ -20,6 +21,7 @@ export const initialBoardData = {
         'item-5',
         'item-6',
         'item-7',
+        'item-8',
       ],
     },
     'column-2': {
