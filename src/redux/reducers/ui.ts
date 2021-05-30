@@ -2,6 +2,7 @@ import { v4 } from 'uuid'
 import { initialBoardData } from '../../data/board-initial-data'
 import {
   REFRESH_BOARD_STATE,
+  SET_EDIT_VALUE,
   SET_NEW_VALUE,
   UiActions,
   UiState,
@@ -34,6 +35,23 @@ export default function ui(
               ...state.board.columns[columnFocus].itemsIds,
               uniqueId,
             ],
+          },
+        },
+      },
+    }
+  }
+
+  case SET_EDIT_VALUE: {
+    const { name, newContent } = action.payload.editCard
+    return {
+      ...state,
+      board: {
+        ...state.board,
+        items: {
+          ...state.board.items,
+          [name]: {
+            ...state.board.items[name],
+            content: newContent,
           },
         },
       },

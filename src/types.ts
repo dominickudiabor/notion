@@ -5,6 +5,7 @@ export const REMOVE_PRODUCT = 'REMOVE_PRODUCT'
 //UI types
 export const REFRESH_BOARD_STATE = 'REFRESH_BOARD_STATE'
 export const SET_NEW_VALUE = 'SET_NEW_VALUE'
+export const SET_EDIT_VALUE = 'SET_EDIT_VALUE'
 // Enum
 export enum DialogType {
     SignIn = 'signIn',
@@ -48,12 +49,23 @@ export type RefreshBoardStateAction = {
     }
 }
 
+export type SetEditedContentAction = {
+    type: typeof SET_EDIT_VALUE
+    payload: {
+        editCard: { name: string; newContent: string }
+    }
+}
+
+//miscellaneous
 export type newItemProps = {
     newItem: string
     columnFocus: string
 }
 
-export type UiActions = SetNewValueAction | RefreshBoardStateAction
+export type UiActions =
+    | SetNewValueAction
+    | RefreshBoardStateAction
+    | SetEditedContentAction
 
 // Use this union in reducer
 export type ProductActions = AddProductAction | RemoveProductAction
