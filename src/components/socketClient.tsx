@@ -3,9 +3,11 @@ import 'medium-editor/dist/css/themes/default.css'
 import React, { useEffect, useRef, useState } from 'react'
 import Identicon from 'react-identicons'
 import Editor from 'react-medium-editor'
+import { useSelector } from 'react-redux'
 import { Navbar, NavbarBrand, UncontrolledTooltip } from 'reactstrap'
 import { v4 } from 'uuid'
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
+import { AppState } from '../types'
 
 type SocketConectionProps = {
     currentUsers: any[]
@@ -17,6 +19,7 @@ const client = new W3CWebSocket('ws://127.0.0.1:8000')
 const contentDefaultMessage = 'Start writing your document here'
 
 export const SocketConnection = () => {
+  const { board } = useSelector((state: AppState) => state.ui)
   const [state, setState] = useState<SocketConectionProps>({
     currentUsers: [],
     userActivity: [],
@@ -53,25 +56,35 @@ current content of the editor to the server. */
     )
   }
 
+  const onSendBoardData = () => {
+    client.send(
+      JSON.stringify({
+        type: 'board-data',
+        content: board,
+      })
+    )
+  }
+
   useEffect(() => {
     client.onopen = () => {
       console.log('WebSocket Client Connected')
     }
-    client.onmessage = (message: { data: string }) => {
-      const dataFromServer = JSON.parse(message.data)
-      const stateToChange = {} as any
-      if (dataFromServer.type === 'userevent') {
-        stateToChange.currentUsers = Object.values(
-          dataFromServer.data.users
-        )
-      } else if (dataFromServer.type === 'contentchange') {
-        stateToChange.text =
-                    dataFromServer.data.editorContent || contentDefaultMessage
-      }
-      stateToChange.userActivity = dataFromServer.data.userActivity
-      setState({
-        ...stateToChange,
-      })
+    client.onmessage = (message: { data: {} }) => {
+      console.log(message.data)
+      // const dataFromServer = JSON.parse(message.data)
+      // const stateToChange = {} as any
+      // if (dataFromServer.type === 'userevent') {
+      //     stateToChange.currentUsers = Object.values(
+      //         dataFromServer.data.users
+      //     )
+      // } else if (dataFromServer.type === 'contentchange') {
+      //     stateToChange.text =
+      //         dataFromServer.data.editorContent || contentDefaultMessage
+      // }
+      // stateToChange.userActivity = dataFromServer.data.userActivity
+      // setState({
+      //     ...stateToChange,
+      // })
     }
   }, [])
 
@@ -166,6 +179,7 @@ current content of the editor to the server. */
       <div className="container-fluid">
         {!state.username ? showEditorSection() : showLoginSection()}
       </div>
+      <button onClick={onSendBoardData}>Click to test</button>
     </React.Fragment>
   )
 }
