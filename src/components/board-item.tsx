@@ -2,27 +2,28 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import Modal from 'react-modal'
-import { useDispatch } from 'react-redux'
-import { setEditedContentValue } from '../redux/actions'
+import { client } from './board'
 import { BoardItemEl, ModalButton, ModalTextArea } from './utils/styles'
 import { BoardItemProps } from './utils/types'
 
 Modal.setAppElement('#root')
 
-// Create and export the BoardItem component
 export const BoardItem = (props: BoardItemProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [edit, setEdit] = useState<string>(props.item.content)
-  const dispatch = useDispatch()
 
   const activateModal = (e: any) => {
     setIsOpen(!isOpen)
   }
 
   const setEditContent = async () => {
-    await dispatch(
-      setEditedContentValue({ name: props.item.id, newContent: edit })
+    await client.send(
+      JSON.stringify({
+        type: 'edit-content',
+        content: { name: props.item.id, newContent: edit },
+      })
     )
+
     setIsOpen(false)
   }
 

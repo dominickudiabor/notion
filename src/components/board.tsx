@@ -2,9 +2,12 @@ import * as React from 'react'
 import { DragDropContext } from 'react-beautiful-dnd'
 import { useDispatch, useSelector } from 'react-redux'
 import { w3cwebsocket as W3CWebSocket } from 'websocket'
-import { refreshBoardState } from '../redux/actions'
+import {
+  refreshBoardState,
+  setEditedContentValue,
+  setNewItemValue,
+} from '../redux/actions'
 import { AppState } from '../types'
-// Import BoardColumn component
 import { BoardColumn } from './board-column'
 import { BoardEl } from './utils/styles'
 
@@ -24,7 +27,22 @@ export const Board = () => {
     client.onmessage = (message: { data: any }) => {
       const syncData = JSON.parse(message.data)
       console.log('Got reply from server', JSON.parse(message.data))
-      dispatch(refreshBoardState(syncData.content))
+
+      switch (syncData.type) {
+      case 'move-content-same-column':
+      case 'move-content-different-column':
+        dispatch(refreshBoardState(syncData.content))
+        break
+      case 'add-new-content':
+        dispatch(setNewItemValue(syncData.content))
+        break
+      case 'edit-content':
+        dispatch(setEditedContentValue(syncData.content))
+        break
+
+      default:
+        break
+      }
     }
   }, [dispatch])
 
@@ -78,14 +96,11 @@ export const Board = () => {
         },
       }
 
-      // Update the board state with new data
-      dispatch(refreshBoardState(newState))
-
       //inform the server of an updated board
       await client.send(
         JSON.stringify({
-          type: 'message',
-          content: state,
+          type: 'move-content-same-column',
+          content: newState,
         })
       )
     } else {
@@ -124,14 +139,11 @@ export const Board = () => {
         },
       }
 
-      // Update the board state with new data
-      dispatch(refreshBoardState(newState))
-
       //inform the server of an updated board
       await client.send(
         JSON.stringify({
-          type: 'message',
-          content: state,
+          type: 'move-content-different-column',
+          content: newState,
         })
       )
     }
