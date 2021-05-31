@@ -1,18 +1,14 @@
 import * as React from 'react'
 import { DragDropContext } from 'react-beautiful-dnd'
 import { useDispatch, useSelector } from 'react-redux'
-import styled from 'styled-components'
+import { w3cwebsocket as W3CWebSocket } from 'websocket'
 import { refreshBoardState } from '../redux/actions'
 import { AppState } from '../types'
 // Import BoardColumn component
 import { BoardColumn } from './board-column'
+import { BoardEl } from './utils/styles'
 
-// Create styles board element properties
-const BoardEl = styled.div`
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-`
+export const client = new W3CWebSocket('ws://127.0.0.1:8000')
 
 export const Board = () => {
   // Initialize board state with board data
@@ -20,8 +16,20 @@ export const Board = () => {
 
   const dispatch = useDispatch()
 
+  //runs after when component renders
+  React.useEffect(() => {
+    client.onopen = () => {
+      console.log('WebSocket Client Connected')
+    }
+    client.onmessage = (message: { data: any }) => {
+      const syncData = JSON.parse(message.data)
+      console.log('Got reply from server', JSON.parse(message.data))
+      dispatch(refreshBoardState(syncData.content))
+    }
+  }, [dispatch])
+
   // Handle drag & drop
-  const onDragEnd = (result: any) => {
+  const onDragEnd = async (result: any) => {
     const { source, destination, draggableId } = result
     console.log(source, destination, draggableId)
 
@@ -72,6 +80,14 @@ export const Board = () => {
 
       // Update the board state with new data
       dispatch(refreshBoardState(newState))
+
+      //inform the server of an updated board
+      await client.send(
+        JSON.stringify({
+          type: 'message',
+          content: state,
+        })
+      )
     } else {
       // Moving items from one list to another
       // Get all item ids in source list
@@ -110,6 +126,14 @@ export const Board = () => {
 
       // Update the board state with new data
       dispatch(refreshBoardState(newState))
+
+      //inform the server of an updated board
+      await client.send(
+        JSON.stringify({
+          type: 'message',
+          content: state,
+        })
+      )
     }
   }
 

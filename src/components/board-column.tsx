@@ -1,59 +1,38 @@
 import * as React from 'react'
 import { Droppable } from 'react-beautiful-dnd'
-import { useDispatch } from 'react-redux'
-import styled from 'styled-components'
-import { setNewItemValue } from '../redux/actions'
+import { useDispatch, useSelector } from 'react-redux'
+import { refreshBoardState, setNewItemValue } from '../redux/actions'
+import { AppState } from '../types'
+import { client } from './board'
 // Import BoardItem component
 import { BoardItem } from './board-item'
-
-// Define types for board column element properties
-type BoardColumnProps = {
-    key: string
-    column: any
-    items: any
-}
-
-// Define types for board column content style properties
-// This is necessary for TypeScript to accept the 'isDraggingOver' prop.
-type BoardColumnContentStylesProps = {
-    isDraggingOver: boolean
-}
-
-// Create styles for BoardColumnWrapper element
-const BoardColumnWrapper = styled.div`
-    flex: 1;
-    padding: 8px;
-    background-color: #e5eff5;
-    border-radius: 4px;
-
-    & + & {
-        margin-left: 12px;
-    }
-`
-
-// Create styles for BoardColumnTitle element
-const BoardColumnTitle = styled.h2`
-    font: 14px sans-serif;
-    margin-bottom: 12px;
-`
-
-// Create styles for BoardColumnContent element
-const BoardColumnContent = styled.div<BoardColumnContentStylesProps>`
-    min-height: 20px;
-    background-color: ${(props) => (props.isDraggingOver ? '#aecde0' : null)};
-    border-radius: 4px;
-`
-const BoardInput = styled.input`
-    margin: 5px 0;
-    padding: 10px 5px;
-`
+import {
+  BoardColumnContent,
+  BoardColumnTitle,
+  BoardColumnWrapper,
+  BoardInput,
+} from './utils/styles'
+import { BoardColumnProps } from './utils/types'
 
 // Create and export the BoardColumn component
 export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
   const dispatch = useDispatch()
+  const { board } = useSelector((state: AppState) => state.ui)
 
   //handle user input
   const [input, setInput] = React.useState('')
+
+  //runs after when component renders
+  React.useEffect(() => {
+    client.onopen = () => {
+      console.log('WebSocket Client Connected')
+    }
+    client.onmessage = (message: { data: any }) => {
+      const syncData = JSON.parse(message.data)
+      console.log('Got reply from server', JSON.parse(message.data))
+      dispatch(refreshBoardState(syncData.content))
+    }
+  }, [dispatch])
 
   const handleNewInput = (e: { target: HTMLInputElement }) => {
     const { value } = e.target
@@ -68,8 +47,14 @@ export const BoardColumn: React.FC<BoardColumnProps> = (props) => {
       if (input.length < 1) return
       const { name, value } = event.currentTarget
       setInput('')
-      dispatch(
+      await dispatch(
         setNewItemValue({ newItem: value, columnFocus: name.trim() })
+      )
+      await client.send(
+        JSON.stringify({
+          type: 'message',
+          content: board,
+        })
       )
     }
   }

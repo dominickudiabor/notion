@@ -3,46 +3,12 @@ import { useState } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import Modal from 'react-modal'
 import { useDispatch } from 'react-redux'
-import styled from 'styled-components'
 import { setEditedContentValue } from '../redux/actions'
+import { BoardItemEl, ModalButton, ModalTextArea } from './utils/styles'
+import { BoardItemProps } from './utils/types'
 
 Modal.setAppElement('#root')
 
-// Define types for board item element properties
-type BoardItemProps = {
-    index: number
-    item: { id: string; content: string }
-}
-
-// Define types for board item element style properties
-// This is necessary for TypeScript to accept the 'isDragging' prop.
-type BoardItemStylesProps = {
-    isDragging: boolean
-}
-
-// Create style for board item element
-const BoardItemEl = styled.div<BoardItemStylesProps>`
-    padding: 8px;
-    background-color: ${(props) => (props.isDragging ? '#d3e4ee' : '#fff')};
-    border-radius: 4px;
-    transition: background-color 0.25s ease-out;
-
-    &:hover {
-        background-color: #f7fafc;
-    }
-
-    & + & {
-        margin-top: 4px;
-    }
-`
-
-const ModalButton = styled.button``
-
-const ModalTextArea = styled.textarea`
-    display: block;
-    margin: 20px 0;
-    resize: none;
-`
 // Create and export the BoardItem component
 export const BoardItem = (props: BoardItemProps) => {
   const [isOpen, setIsOpen] = useState(false)
